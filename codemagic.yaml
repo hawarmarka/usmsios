@@ -1,46 +1,46 @@
 workflows:
-  usms-ios-appstore:
-    name: USMS iOS App Store / TestFlight
+  usms-ios-check:
+    name: USMS iOS Check Build
     max_build_duration: 60
     instance_type: mac_mini_m2
+
     environment:
       node: 20
       xcode: latest
       cocoapods: default
       vars:
-        BUNDLE_ID: "com.hawar.usms"
-        XCODE_WORKSPACE: "ios/App/App.xcworkspace"
-        XCODE_SCHEME: "App"
-        APP_STORE_APPLE_ID: "" # App Store Connect'te oluşan Apple ID numarasını buraya yazabilirsin.
-      ios_signing:
-        distribution_type: app_store
-        bundle_identifier: "com.hawar.usms"
+        BUNDLE_ID: com.hawar.usms
+        XCODE_WORKSPACE: ios/App/App.xcworkspace
+        XCODE_SCHEME: App
+
     scripts:
       - name: Install npm dependencies
         script: |
           npm install
+
       - name: Prepare Capacitor iOS project
         script: |
+          if [ ! -d "ios" ]; then
+            npx cap add ios
+          fi
+          npx cap sync ios
+
+      - name: Patch iOS permissions
+        script: |
           bash scripts/prepare-ios.sh
-      - name: Set iOS build number
+
+      - name: Build iOS simulator app
         script: |
           cd ios/App
-          agvtool new-version -all $BUILD_NUMBER || true
-          cd ../..
-      - name: Apply automatic code signing
-        script: |
-          xcode-project use-profiles
-      - name: Build signed IPA
-        script: |
-          xcode-project build-ipa             --workspace "$XCODE_WORKSPACE"             --scheme "$XCODE_SCHEME"
+          xcodebuild \
+            -workspace App.xcworkspace \
+            -scheme App \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            CODE_SIGNING_ALLOWED=NO \
+            build
+
     artifacts:
-      - build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log
-      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.app
-      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.dSYM
-    publishing:
-      app_store_connect:
-        auth: integration
-        submit_to_testflight: true
-        beta_groups:
-          - Internal Testers
+      - ios/App/build/**/*.app
