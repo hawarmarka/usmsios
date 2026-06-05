@@ -1,0 +1,411 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#071426">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>USMS Mobile</title>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/assets/icons/icon-192.png">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body class="theme-aurora wallpaper-pro-midnight bubbles-modern font-normal">
+  <section id="loginView" class="login-view pro-login">
+    <div class="matrix-video-bg" aria-hidden="true">
+      <div class="matrix-glow"></div>
+      <div class="matrix-rain">
+        <span>01001101</span><span>SECURE</span><span>USMS</span><span>ENCRYPT</span><span>PRIVATE</span>
+        <span>101101</span><span>ROOM</span><span>AUTH</span><span>LOGIN</span><span>NODE</span>
+        <span>TURN</span><span>SFU</span><span>JITSI</span><span>HASH</span><span>CRYPTO</span>
+      </div>
+    </div>
+    <div class="login-phone pro-login-card">
+      <div class="login-logo"><img src="/assets/ui/brand.svg" alt="USMS"></div>
+      <h1>USMS Secure</h1>
+      <p>Telegram tarzı hızlı giriş. Sohbet, profil ve gelişmiş ayarlar içeriden yönetilir.</p>
+
+      <form id="loginForm" class="login-form">
+        <input id="avatarInput" type="file" accept="image/*" hidden>
+        <button type="button" id="avatarPickBtn" class="login-avatar hidden" tabindex="-1" aria-hidden="true">
+          <span id="avatarPreviewText">HA</span>
+          <img id="avatarPreview" alt="">
+        </button>
+
+        <label class="tg-field">
+          <span>İsim Soyisim</span>
+          <input id="nameInput" maxlength="60" autocomplete="name" placeholder="Örn. Hawar Marka" required>
+        </label>
+
+        <label class="tg-field">
+          <span>Kullanıcı Adı</span>
+          <input id="usernameInput" maxlength="32" autocomplete="username" placeholder="@hawar" required>
+        </label>
+
+        <input id="emailInput" type="hidden">
+        <input id="phoneInput" type="hidden">
+        <input id="bioInput" type="hidden">
+
+        <label class="tg-field">
+          <span>Oda No</span>
+          <input id="roomInput" maxlength="96" autocomplete="off" placeholder="Örn. aile-odasi" required>
+        </label>
+
+        <label class="tg-field">
+          <span>Oda Şifresi</span>
+          <input id="passwordInput" maxlength="160" type="password" autocomplete="current-password" placeholder="Güvenli oda şifresi" required>
+        </label>
+
+        <button id="joinBtn" class="primary-btn" type="submit">Güvenli Giriş Yap</button>
+      </form>
+
+      <div id="serverStatus" class="server-status"><i></i><span>Sunucu hazırlanıyor...</span></div>
+      <p class="login-note">Hesabın, profilin ve tüm ayarlar uygulama içinden yönetilir.</p>
+    </div>
+  </section>
+
+  <main id="appView" class="app-shell hidden">
+    <aside class="sidebar" id="mobileList">
+      <header class="mobile-top">
+        <button id="openProfileBtn" class="profile-pill">
+          <span id="myAvatar">HA</span>
+          <img id="myAvatarImg" alt="">
+        </button>
+        <div class="top-title">
+          <strong id="myName">USMS</strong>
+          <small id="wsStatus">bağlanıyor...</small>
+        </div>
+        <button id="copyInviteBtn" class="icon-btn" title="Davet paylaş"><img class="ui-icon" src="/assets/ui/link.svg" alt=""></button>
+      </header>
+
+      <div class="search-box">
+        <span>⌕</span>
+        <input id="searchInput" placeholder="Mesajlarda ara">
+      </div>
+
+      <button class="room-card active" id="roomCard">
+        <span id="roomAvatar" class="room-avatar"><img class="avatar-icon" src="/assets/ui/brand.svg" alt=""></span>
+        <span class="room-card-main">
+          <strong id="roomTitle">Oda</strong>
+          <small id="roomSubtitle">Davet bilgilerini paylaş.</small>
+        </span>
+        <time id="roomTime">şimdi</time>
+      </button>
+
+      <section class="list-block">
+        <div class="section-head">
+          <span>Odada olanlar</span>
+          <button id="openContactsBtn" class="mini-link">Kişi ekle</button>
+        </div>
+        <div id="peerList" class="peer-list"></div>
+      </section>
+
+      <section class="list-block">
+        <div class="section-head">
+          <span>Durumlar</span>
+          <button id="newStatusBtn" class="mini-link">Paylaş</button>
+        </div>
+        <div id="statusList" class="status-list"><div class="empty-small">Henüz durum yok.</div></div>
+      </section>
+    </aside>
+
+    <section class="chat-panel" id="mobileChat">
+      <header class="chat-header">
+        <button id="mobileBackBtn" class="mobile-back">‹</button>
+        <button id="roomInfoBtn" class="chat-person">
+          <span id="chatRoomAvatar" class="chat-avatar"><img class="avatar-icon" src="/assets/ui/brand.svg" alt=""></span>
+          <span>
+            <strong id="chatRoomName">Oda</strong>
+            <small id="chatSub">uçtan uca şifreli · 1 kişi</small>
+          </span>
+        </button>
+        <div class="chat-actions">
+          <button id="audioCallBtn" title="Sesli arama"><img class="ui-icon" src="/assets/ui/phone.svg" alt=""></button>
+          <button id="videoCallBtn" title="Görüntülü arama"><img class="ui-icon" src="/assets/ui/video.svg" alt=""></button>
+          <button id="groupCallBtn" title="Grup araması"><img class="ui-icon" src="/assets/ui/users.svg" alt=""></button>
+          <button id="openMainMenuBtn" title="Menü"><img class="ui-icon" src="/assets/ui/menu.svg" alt=""></button>
+        </div>
+      </header>
+
+      <div id="messages" class="messages">
+        <div class="day-pill">Bugün</div>
+        <div class="system-pill">🔒 Bu oda şifreli ve kalıcıdır. Aynı oda + parola ile tekrar girince geçmiş yüklenir.</div>
+      </div>
+
+      <div id="typingLine" class="typing-line hidden">yazıyor...</div>
+      <div id="emojiPanel" class="emoji-panel hidden"></div>
+
+      <div id="replyPreview" class="reply-preview hidden"><span id="replyPreviewText"></span><button id="cancelReplyBtn">×</button></div>
+      <footer class="composer">
+        <button id="emojiBtn" class="compose-btn" title="Emoji"><img class="ui-icon" src="/assets/ui/smile.svg" alt=""></button>
+        <button id="attachBtn" class="compose-btn" title="Dosya"><img class="ui-icon" src="/assets/ui/attach.svg" alt=""></button>
+        <button id="cameraShotBtn" class="compose-btn" title="Fotoğraf çek"><img class="ui-icon" src="/assets/ui/camera.svg" alt=""></button>
+        <input id="fileInput" type="file" hidden>
+        <input id="cameraInput" type="file" accept="image/*" capture="environment" hidden>
+        <textarea id="messageInput" rows="1" placeholder="Mesaj yaz" maxlength="5000"></textarea>
+        <button id="voiceBtn" class="compose-btn recordable" title="Sesli mesaj"><img class="ui-icon" src="/assets/ui/mic.svg" alt=""></button>
+        <button id="videoNoteBtn" class="compose-btn recordable" title="Video mesaj"><img class="ui-icon" src="/assets/ui/video.svg" alt=""></button>
+        <button id="sendBtn" class="send-btn" title="Gönder"><img class="ui-icon" src="/assets/ui/send.svg" alt=""></button>
+      </footer>
+    </section>
+
+    <aside id="infoPanel" class="info-panel">
+      <div class="sheet-handle"></div>
+      <div class="info-head">
+        <strong>Bilgi</strong>
+        <button id="closeInfoBtn">×</button>
+      </div>
+      <div class="info-avatar" id="selectedAvatar"><span>🔐</span><img alt=""></div>
+      <h3 id="selectedName">USMS</h3>
+      <p id="selectedBio">Güvenli oda.</p>
+      <div class="info-list">
+        <div><span>E-posta</span><strong id="selectedEmail">—</strong></div>
+        <div><span>Telefon</span><strong id="selectedPhone">—</strong></div>
+        <div><span>Durum</span><strong id="selectedStatus">çevrimiçi</strong></div>
+      </div>
+      <label class="tg-field"><span>Kişiye özel not</span><textarea id="peerNoteInput" rows="3" placeholder="Bu not sadece sende saklanır."></textarea></label>
+      <button id="savePeerNoteBtn" class="secondary-btn">Notu Kaydet</button>
+      <button id="startPrivateChatBtn" class="primary-btn private-chat-btn">Özel Sohbet Aç</button>
+    </aside>
+
+    <nav class="bottom-tabs">
+      <button class="tab-btn active" data-tab="chats">Sohbet</button>
+      <button class="tab-btn" id="contactsTabBtn">Kişiler</button>
+      <button class="tab-btn" data-tab="status">Durum</button>
+      <button class="tab-btn" data-tab="settings">Ayarlar</button>
+    </nav>
+  </main>
+
+  <section id="callView" class="call-view hidden fit-contain effect-none">
+    <video id="remoteVideo" class="remote-video" autoplay playsinline></video>
+    <audio id="remoteAudio" autoplay playsinline></audio>
+    <video id="localVideo" class="local-video" autoplay playsinline muted></video>
+
+    <div class="call-topbar">
+      <button id="callBackBtn" class="call-top-btn"><img class="ui-icon" src="/assets/ui/back.svg" alt=""></button>
+      <strong id="callName">Arama</strong>
+      <span id="callState" class="hidden"></span>
+      <select id="qualitySelect" title="Kalite">
+        <option value="fhd">Full HD</option>
+        <option value="hd">HD</option>
+        <option value="eco">Ekonomi</option>
+      </select>
+      <select id="videoEffectSelect" title="Efekt">
+        <option value="none">Efekt yok</option>
+        <option value="cinematic">Sinematik</option>
+        <option value="soft">Soft</option>
+        <option value="mono">Siyah beyaz</option>
+        <option value="vivid">Canlı</option>
+      </select>
+    </div>
+
+    <div class="call-controls">
+      <button id="muteBtn" class="call-btn" title="Mikrofon"><img class="ui-icon" src="/assets/ui/mic.svg" alt=""></button>
+      <button id="switchCamBtn" class="call-btn" title="Ön/arka kamera"><img class="ui-icon" src="/assets/ui/rotate.svg" alt=""></button>
+      <button id="cameraBtn" class="call-btn" title="Kamera"><img class="ui-icon" src="/assets/ui/video.svg" alt=""></button>
+      <button id="fitBtn" class="call-btn" title="Sığdır / doldur"><img class="ui-icon" src="/assets/ui/fit.svg" alt=""></button>
+      <button id="snapshotBtn" class="call-btn" title="Fotoğraf al"><img class="ui-icon" src="/assets/ui/camera.svg" alt=""></button>
+      <button id="callInviteBtn" class="call-btn" title="Aramaya kişi ekle / link paylaş"><img class="ui-icon" src="/assets/ui/userplus.svg" alt=""></button>
+      <button id="endCallBtn" class="call-btn end" title="Kapat"><img class="ui-icon" src="/assets/ui/close.svg" alt=""></button>
+    </div>
+  </section>
+
+  <section id="groupCallView" class="group-call-view hidden">
+    <div class="group-call-topbar">
+      <button id="groupCallBackBtn" class="call-top-btn"><img class="ui-icon" src="/assets/ui/back.svg" alt=""></button>
+      <strong id="groupCallTitle">Grup Araması</strong>
+      <button id="groupCallInviteBtn" class="group-call-action"><img class="ui-icon" src="/assets/ui/link.svg" alt=""> Davet</button>
+      <button id="groupCallOpenExternalBtn" class="group-call-action"><img class="ui-icon" src="/assets/ui/video.svg" alt=""> Aç</button>
+      <button id="groupCallLeaveBtn" class="group-call-action danger"><img class="ui-icon" src="/assets/ui/close.svg" alt=""> Çık</button>
+    </div>
+    <div id="jitsiContainer" class="jitsi-container"></div>
+    <div id="groupCallLoading" class="group-call-loading">
+      <strong>Grup araması hazırlanıyor...</strong>
+      <span>Çalışmazsa “Aç” butonuyla güvenli şekilde ayrı sekmede aç.</span>
+    </div>
+  
+
+  <div id="mainMenuModal" class="modal sheet hidden">
+    <div class="sheet-card">
+      <div class="sheet-handle"></div>
+      <button id="shareInviteBtn" class="menu-row">Davet bağlantısını paylaş <span><img class="ui-icon" src="/assets/ui/link.svg" alt=""></span></button>
+      <button id="openRoomSettingsBtn" class="menu-row">Oda profilini düzenle <span><img class="ui-icon" src="/assets/ui/edit.svg" alt=""></span></button>
+      <button id="openContactsFromMenuBtn" class="menu-row">Kişiler <span><img class="ui-icon" src="/assets/ui/users.svg" alt=""></span></button>
+      <button id="openGroupCallFromMenuBtn" class="menu-row">Grup araması başlat <span><img class="ui-icon" src="/assets/ui/video.svg" alt=""></span></button>
+      <button id="openMediaGalleryBtn" class="menu-row">Medya, dosya ve linkler <span>›</span></button>
+      <button id="openAccountBtn" class="menu-row">Hesap / cihazlar <span>›</span></button>
+      <button id="securityBtn" class="menu-row">Güvenlik numarası <span><img class="ui-icon" src="/assets/ui/shield.svg" alt=""></span></button>
+      <button id="openSettingsBtn" class="menu-row">Ayarlar <span><img class="ui-icon" src="/assets/ui/settings.svg" alt=""></span></button>
+      <button id="closeMainMenuBtn" class="menu-row danger">Kapat</button>
+    </div>
+  </div>
+
+  <div id="contactsModal" class="modal sheet hidden">
+    <div class="sheet-card tall">
+      <div class="sheet-handle"></div>
+      <div class="sheet-title">
+        <strong>Kişiler</strong>
+        <button id="closeContactsBtn">×</button>
+      </div>
+      <div class="add-contact">
+        <input id="contactUsernameInput" placeholder="@kullaniciadi">
+        <button id="addContactBtn">Ekle</button>
+      </div>
+      <p class="hint">Kullanıcı adı, bu odaya daha önce girmiş kişilerden bulunur. Karşı tarafın @kullanıcı adını bilmelisin.</p>
+      <div id="contactsList" class="contacts-list"></div>
+    </div>
+  </div>
+
+  <div id="roomSettingsModal" class="modal sheet hidden">
+    <div class="sheet-card tall">
+      <div class="sheet-handle"></div>
+      <div class="sheet-title">
+        <strong>Oda Profili</strong>
+        <button id="closeRoomSettingsBtn">×</button>
+      </div>
+      <button type="button" id="roomAvatarBtn" class="room-avatar-editor">
+        <span id="roomAvatarText">US</span>
+        <img id="roomAvatarPreview" alt="">
+      </button>
+      <input id="roomAvatarInput" type="file" accept="image/*" hidden>
+      <label class="tg-field"><span>Görünen oda adı</span><input id="roomDisplayNameInput" maxlength="80" placeholder="Örn. Aile Grubu"></label>
+      <label class="tg-field"><span>Oda açıklaması</span><textarea id="roomDescriptionInput" rows="3" maxlength="180" placeholder="Bu oda hakkında kısa bilgi"></textarea></label>
+      <button id="saveRoomSettingsBtn" class="primary-btn">Odayı Kaydet</button>
+      <p class="hint">Güvenlik için gerçek oda adı değişmez; burada görünen ad ve profil fotoğrafı değişir.</p>
+    </div>
+  </div>
+
+  <div id="incomingModal" class="modal hidden">
+    <div class="incoming-card">
+      <div id="incomingAvatar" class="incoming-avatar"><img class="ui-icon large" src="/assets/ui/phone.svg" alt=""></div>
+      <h3 id="incomingTitle">Gelen arama</h3>
+      <p id="incomingText">Aramayı kabul etmek istiyor musun?</p>
+      <div class="incoming-actions"><button id="rejectCallBtn" class="reject-btn">Reddet</button><button id="acceptCallBtn" class="accept-btn">Kabul Et</button></div>
+    </div>
+  </div>
+
+  <div id="securityModal" class="modal sheet hidden">
+    <div class="sheet-card">
+      <div class="sheet-handle"></div>
+      <div class="sheet-title"><strong>Güvenlik numarası</strong><button id="closeSecurityBtn">×</button></div>
+      <p class="hint">Bu numara oda adı + paroladan üretilir. Aynı odadaki kişilerde aynı olmalıdır.</p>
+      <div id="securityNumber" class="security-number">—</div>
+    </div>
+  </div>
+
+  <div id="profileModal" class="modal sheet hidden">
+    <div class="sheet-card tall">
+      <div class="sheet-handle"></div>
+      <div class="sheet-title"><strong>Profilim</strong><button id="closeProfileBtn">×</button></div>
+      <button type="button" id="profileAvatarBtn" class="profile-photo-edit"><span id="profileAvatarText">HA</span><img id="profileAvatarImg" alt=""></button>
+      <label class="tg-field"><span>Ad</span><input id="profileNameInput" maxlength="60"></label>
+      <label class="tg-field"><span>Kullanıcı adı</span><input id="profileUsernameInput" maxlength="32" placeholder="@hawar"></label>
+      <label class="tg-field"><span>E-posta</span><input id="profileEmailInput" maxlength="120"></label>
+      <label class="tg-field"><span>Telefon</span><input id="profilePhoneInput" maxlength="40"></label>
+      <label class="tg-field"><span>Durum</span><input id="profileBioInput" maxlength="200"></label>
+      <button id="saveProfileBtn" class="primary-btn">Profili Kaydet</button>
+    </div>
+  </div>
+
+  <div id="settingsModal" class="modal sheet hidden">
+    <div class="sheet-card tall settings-pro-card">
+      <div class="sheet-handle"></div>
+      <div class="sheet-title"><strong>Ayar Merkezi</strong><button id="closeSettingsBtn">×</button></div>
+
+      <div class="settings-tabs">
+        <button class="settings-tab active" data-settings-tab="appearance">Tasarım</button>
+        <button class="settings-tab" data-settings-tab="chat">Sohbet</button>
+        <button class="settings-tab" data-settings-tab="call">Arama</button>
+        <button class="settings-tab" data-settings-tab="privacy">Gizlilik</button>
+      </div>
+
+      <div class="settings-page active" data-settings-page="appearance">
+        <div class="settings-list">
+          <label><span>Tema</span><select id="themeSelect"><option value="aurora">Gece mavisi</option><option value="royal">Royal blue</option><option value="emerald">Emerald</option><option value="violet">Violet</option></select></label>
+          <label><span>Sohbet arka planı</span><select id="wallpaperSelect"><option value="pro-midnight">Pro Midnight</option><option value="pro-ocean">Pro Ocean</option><option value="pro-graphite">Pro Graphite</option><option value="pro-emerald">Pro Emerald</option><option value="pro-royal">Pro Royal</option><option value="aurora">Gece mavisi</option><option value="mesh">Sade mesh</option><option value="stars">Yıldızlı</option><option value="plain">Düz renk</option><option value="cyber">Cyber Rain</option><option value="velvet">Velvet Noir</option><option value="sapphire">Sapphire</option><option value="emeraldgrid">Emerald Grid</option><option value="graphite">Graphite Luxe</option></select></label>
+          <label><span>Balon stili</span><select id="bubbleSelect"><option value="modern">Modern</option><option value="round">Yuvarlak</option><option value="compact">Kompakt</option></select></label>
+          <label><span>Yazı boyutu</span><select id="fontSelect"><option value="normal">Normal</option><option value="large">Büyük</option><option value="small">Küçük</option></select></label>
+        </div>
+      </div>
+
+      <div class="settings-page" data-settings-page="chat">
+        <div class="settings-list">
+          <label><span>Bildirim sesi</span><select id="soundSelect"><option value="prism">Prism</option><option value="pop">Pop</option><option value="glass">Glass</option><option value="silent">Sessiz</option></select></label>
+          <label><span>Gizli sohbet modu</span><select id="secretModeToggle"><option value="off">Kapalı</option><option value="on">Açık</option></select></label>
+          <label><span>Süreli mesajlar</span><select id="expireSelect"><option value="never">Kapalı</option><option value="1h">1 saat</option><option value="24h">24 saat</option><option value="7d">7 gün</option></select></label>
+          <label><span>Enter ile gönder</span><select id="enterSendSelect"><option value="on">Açık</option><option value="off">Kapalı</option></select></label>
+        </div>
+      </div>
+
+      <div class="settings-page" data-settings-page="call">
+        <div class="settings-list">
+          <label><span>Varsayılan arama kalitesi</span><select id="defaultQualitySelect"><option value="hd">HD önerilen</option><option value="fhd">Full HD</option><option value="eco">Ekonomi</option></select></label>
+          <label><span>Kendi görüntüm</span><select id="selfViewMirrorSelect"><option value="off">Normal göster</option><option value="on">Ayna gibi göster</option></select></label>
+          <label><span>Grup araması sunucusu</span><input id="jitsiInfoInput" value="meet.hawarserver.com" readonly></label>
+        </div>
+      </div>
+
+      <div class="settings-page" data-settings-page="privacy">
+        <div class="settings-list">
+          <label><span>Bildirim izni</span><button id="notificationPermissionBtn" class="secondary-btn" type="button">İzin İste</button></label>
+          <label><span>Güvenlik numarası</span><button id="settingsSecurityBtn" class="secondary-btn" type="button">Göster</button></label>
+          <label><span>Yerel hesabı hatırla</span><select id="rememberAccountSelect"><option value="on">Açık</option><option value="off">Kapalı</option></select></label>
+        </div>
+      </div>
+
+      <div class="settings-actions">
+        <button id="testSoundBtn" class="secondary-btn">Sesi Dene</button>
+        <button id="saveSettingsBtn" class="primary-btn">Ayarları Kaydet</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="statusModal" class="modal sheet hidden">
+    <div class="sheet-card">
+      <div class="sheet-handle"></div>
+      <div class="sheet-title"><strong>Durum Paylaş</strong><button id="closeStatusBtn">×</button></div>
+      <label class="tg-field"><span>Durum metni</span><textarea id="statusInput" rows="4" maxlength="500" placeholder="Bugün ne paylaşmak istiyorsun?"></textarea></label>
+      <button id="sendStatusBtn" class="primary-btn">Durumu Paylaş</button>
+    </div>
+  </div>
+
+
+  <div id="messageActionModal" class="modal sheet hidden">
+    <div class="sheet-card">
+      <div class="sheet-handle"></div>
+      <div class="sheet-title"><strong>Mesaj işlemleri</strong><button id="closeMessageActionBtn">×</button></div>
+      <button id="replyMessageBtn" class="menu-row">Cevapla <span>↩</span></button>
+      <button id="copyMessageBtn" class="menu-row">Kopyala <span>⧉</span></button>
+      <button id="editMessageBtn" class="menu-row">Düzenle <span>✎</span></button>
+      <button id="deleteMessageBtn" class="menu-row danger">Herkesten sil <span>⌫</span></button>
+      <button id="pinMessageBtn" class="menu-row">Sabitle <span>📌</span></button>
+      <button id="reactMessageBtn" class="menu-row">❤️ tepki bırak</button>
+    </div>
+  </div>
+
+  <div id="mediaGalleryModal" class="modal sheet hidden">
+    <div class="sheet-card tall">
+      <div class="sheet-handle"></div>
+      <div class="sheet-title"><strong>Medya ve dosyalar</strong><button id="closeMediaGalleryBtn">×</button></div>
+      <div id="mediaGalleryList" class="media-gallery-list"></div>
+    </div>
+  </div>
+
+  <div id="accountModal" class="modal sheet hidden">
+    <div class="sheet-card tall">
+      <div class="sheet-handle"></div>
+      <div class="sheet-title"><strong>Hesap</strong><button id="closeAccountBtn">×</button></div>
+      <p class="hint">İstersen sunucuda kullanıcı hesabı oluştur. Bu, oda parolasının yerine geçmez; oda geçmişi yine oda parolasıyla açılır.</p>
+      <label class="tg-field"><span>Kullanıcı adı</span><input id="accountUsernameInput" maxlength="32" placeholder="@hawar"></label>
+      <label class="tg-field"><span>Ad</span><input id="accountNameInput" maxlength="60" placeholder="Hawar"></label>
+      <label class="tg-field"><span>Hesap şifresi</span><input id="accountPasswordInput" type="password" maxlength="120" placeholder="Hesap için ayrı şifre"></label>
+      <div class="settings-actions"><button id="accountRegisterBtn" class="secondary-btn">Kayıt Ol</button><button id="accountLoginBtn" class="secondary-btn">Giriş Yap</button></div>
+      <div id="accountState" class="hint">Henüz giriş yapılmadı.</div>
+    </div>
+  </div>
+
+  <div id="toastArea" class="toast-area"></div>
+  <script src="/app.js"></script>
+</body>
+</html>

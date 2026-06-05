@@ -1,0 +1,27 @@
+{
+  "name": "usms-enterprise-mobile",
+  "version": "8.2.0",
+  "description": "USMS Enterprise Mobile v8.2 - iOS Capacitor App Store ready",
+  "private": true,
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "check": "node --check server.js && node --check public/app.js",
+    "ios:init": "npx cap add ios",
+    "ios:sync": "npx cap sync ios",
+    "ios:open": "npx cap open ios",
+    "ios:prepare": "bash scripts/prepare-ios.sh"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.1.2",
+    "@capacitor/core": "^6.1.2",
+    "@capacitor/ios": "^6.1.2",
+    "@capacitor/assets": "^3.0.5"
+  }
+}
